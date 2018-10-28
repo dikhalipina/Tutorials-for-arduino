@@ -1,0 +1,72 @@
+#include <SoftwareSerial.h>
+#include <cactus_io_AM2302.h>
+
+#define AM2302_PIN 7 
+
+
+AM2302 dht(AM2302_PIN);
+int LED_RED = 13;
+int LED_GREEN = 12;
+
+SoftwareSerial Bluetooth(10, 9);
+
+void setup() {
+  Bluetooth.begin(9600);
+  Serial.begin(9600);
+  dht.begin();
+  Bluetooth.println("Ready for command...");
+  pinMode(LED_RED, OUTPUT);
+  pinMode(LED_GREEN, OUTPUT);
+}
+
+void loop() {
+
+  dht.readHumidity();
+  dht.readTemperature();
+  if (isnan(dht.humidity) || isnan(dht.temperature_C)) {
+    return;
+  }
+
+  if ((dht.temperature_C <= 20.00) || (dht.humidity <= 40.00)){
+
+    digitalWrite(LED_GREEN, 0);
+    digitalWrite(LED_RED, 1);
+    Bluetooth.println("Low temperature/humidity");
+
+    Serial.print(dht.humidity); Serial.print(" %\t\t");
+    Serial.print(dht.temperature_C); Serial.println(" *C\t");
+    Bluetooth.print(dht.humidity); Bluetooth.print(" %\t\t");
+    Bluetooth.print(dht.temperature_C); Bluetooth.println(" *C\t");
+
+  }
+  
+  if ((dht.humidity >= 60.00) || (dht.temperature_C >= 25.00)){
+
+    digitalWrite(LED_GREEN, 0);
+    digitalWrite(LED_RED, 1);
+    Bluetooth.println("High level of humidity/temperature");
+
+    Serial.print(dht.humidity); Serial.print(" %\t\t");
+    Serial.print(dht.temperature_C); Serial.println(" *C\t");
+    Bluetooth.print(dht.humidity); Bluetooth.print(" %\t\t");
+    Bluetooth.print(dht.temperature_C); Bluetooth.println(" *C\t");
+
+  }
+
+
+  else {
+    
+    digitalWrite(LED_RED, 0);
+    digitalWrite(LED_GREEN, 1);
+    Bluetooth.println("Comfortable level of humidity and temperature");
+
+    Serial.print(dht.humidity); Serial.print(" %\t\t");
+    Serial.print(dht.temperature_C); Serial.println(" *C\t");
+    Bluetooth.print(dht.humidity); Bluetooth.print(" %\t\t");
+    Bluetooth.print(dht.temperature_C); Bluetooth.println(" *C\t");
+  }
+  
+  delay(1500);
+
+}
+
