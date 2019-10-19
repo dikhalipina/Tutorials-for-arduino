@@ -1,0 +1,28 @@
+#include <SoftwareSerial.h>
+
+#define RxD 6
+#define TxD 7
+SoftwareSerial blueToothSerial(RxD , TxD);
+
+String bluetoothdata;
+
+void setup() {
+  pinMode(RxD, INPUT);
+  pinMode(TxD, OUTPUT);
+  pinMode(8, OUTPUT);
+  blueToothSerial.print("Bonjour");
+  digitalWrite(8, HIGH);
+}
+
+void loop() {
+  if (blueToothSerial.available()) {
+     blueToothSerial.print("Bonjour");
+    bluetoothdata = blueToothSerial.read();
+    if (bluetoothdata == 0) {
+      digitalWrite(8, LOW);
+    }
+    if (bluetoothdata == 1) {
+      digitalWrite(8, HIGH);
+    }
+  }
+}
